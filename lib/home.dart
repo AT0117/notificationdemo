@@ -1,5 +1,7 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:notificationdemo/modules/local_fixed.dart';
+import 'package:notificationdemo/modules/local_scheduled.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -8,62 +10,38 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final FlutterLocalNotificationsPlugin notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
-  Future<void> initializeNotification() async {
-    AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    InitializationSettings settings = InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    await notificationsPlugin.initialize(settings: settings);
-
-    notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
-  }
-
-  Future<void> showNotification() async {
-    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'study_channel_id',
-      'Study Reminders',
-      channelDescription: 'Notifications for learning Flutter',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    NotificationDetails platformDetails = NotificationDetails(
-      android: androidDetails,
-    );
-
-    await notificationsPlugin.show(
-      id: 0,
-      title: 'Hello From Flutter!',
-      body: 'This is your first android Notification!',
-      notificationDetails: platformDetails,
-    );
-  }
-
   @override
   void initState() {
     super.initState();
     initializeNotification();
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            showNotification();
-          },
-          child: Text('Trigger Notification'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                showNotification();
+              },
+              child: Text('Trigger Notification'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                scheduledNotifications();
+              },
+              child: Text('Schedule Notification (7:30 PM)'),
+            ),
+          ],
         ),
       ),
     );

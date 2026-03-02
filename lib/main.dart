@@ -1,7 +1,16 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:notificationdemo/home.dart';
 
 void main() {
+  AwesomeNotifications().initialize(null, [
+    NotificationChannel(
+      channelKey: 'scheduled_key',
+      channelName: 'Scheduled Notification',
+      channelDescription: 'Dinner Notification',
+      importance: NotificationImportance.High,
+    ),
+  ]);
   runApp(NotificationDemo());
 }
 
